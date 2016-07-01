@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 using namespace std;
 
 template <class T>
@@ -51,6 +52,17 @@ public:
     return this -> head;
   }
 
+  ListNode<U> * getLast() {
+    ListNode<U> * currentNode = this -> getHead();
+    if(currentNode == NULL) {
+      return NULL;
+    }
+    while(currentNode -> getNext() != NULL) {
+      currentNode = currentNode -> getNext();
+    }
+    return currentNode;
+  }
+
   void setHead(ListNode<U> * listNode) {
     this -> head = listNode;
   }
@@ -82,6 +94,23 @@ public:
     length++;
   }
 
+  void insert(ListNode<U> * listNode, int position) {
+    if(position > this -> length) {
+      position = length;
+    }
+    if(position > 0 && this -> getHead() != NULL) {
+      ListNode<U> * currentNode = this -> getHead();
+      for (int i = 0; i < position - 2; i++) {
+        currentNode = currentNode -> getNext();
+      }
+      listNode -> setNext(currentNode -> getNext());
+      currentNode -> setNext(listNode);
+    } else {
+      this -> setHead(listNode);
+    }
+    length++;
+  }
+
   void print() {
     ListNode<U> * currentNode = this -> getHead();
     while(currentNode != NULL) {
@@ -106,7 +135,52 @@ public:
     return false;
   }
 
-  bool remove(ListNode<U> * listNode) {
+  bool remove(int position) {
+    if(position > this -> length) {
+      position = length;
+    }
+    if(position == 1) {
+      this -> removeFromBegin();
+    }
+    if(position > 1 && this -> getHead() != NULL) {
+      ListNode<U> * currentNode = this -> getHead();
+      for (int i = 0; i < position - 2; i++) {
+        currentNode = currentNode -> getNext();
+      }
+      ListNode<U> * deleteNode = currentNode -> getNext();
+      currentNode -> setNext(deleteNode -> getNext());
+      length--;
+      delete(deleteNode);
+    }
+    return false;
+  }
+
+  void removeFromBegin() {
+    ListNode<U> * deleteNode = this -> getHead();
+    this -> setHead(this -> getHead() -> getNext());
+    length--;
+    delete(deleteNode);
+  }
+
+  void removeFromEnd() {
+    ListNode<U> * currentNode = this -> getHead();
+    if(currentNode == NULL) {
+      return;
+    }
+    if(currentNode -> getNext() == NULL) {
+      this -> setHead(NULL);
+      delete(currentNode);
+    }
+    while(currentNode -> getNext() -> getNext() != NULL) {
+      currentNode = currentNode -> getNext();
+    }
+    ListNode<U> * deleteNode = currentNode -> getNext();
+    currentNode -> setNext(NULL);
+    length--;
+    delete(deleteNode);
+  }
+
+  bool removeMatch(ListNode<U> * listNode) {
     ListNode<U> * currentNode = this -> getHead();
     ListNode<U> * deleteNode;
     if(currentNode == NULL) return false;
@@ -130,7 +204,7 @@ public:
     return false;
   }
 
-  bool remove(U data) {
+  bool removeMatch(U data) {
     ListNode<U> * currentNode = this -> getHead();
     ListNode<U> * deleteNode;
     if(currentNode == NULL) return false;
@@ -153,6 +227,20 @@ public:
     }
     return false;
   }
+
+  string toString() {
+    string listString = "[";
+    ListNode<U> * currentNode = this -> getHead();
+    while(currentNode != NULL) {
+      listString = listString.append(to_string(currentNode -> getData()));
+      if(currentNode -> getNext() != NULL) {
+        listString = listString.append(", ");
+      }
+      currentNode = currentNode -> getNext();
+    }
+    listString = listString.append("]");
+    return listString;
+  }
 };
 
 int main(int argc, char const *argv[]) {
@@ -169,36 +257,15 @@ int main(int argc, char const *argv[]) {
   linkedList -> insertAtBeginning(new ListNode<int>(21));
   linkedList -> insertAtEnd(new ListNode<int>(65));
   linkedList -> print();
-  if(linkedList -> search(25)) {
-    cout << "25 Exists" << endl;
-  } else {
-    cout << "25 Not Found" << endl;
-  }
-  if(linkedList -> search(71)) {
-    cout << "71 Exists" << endl;
-  } else {
-    cout << "71 Not Found" << endl;
-  }
-  if(linkedList -> remove(listNode)) {
-    cout << "Delete Successful" << endl;
-  } else {
-    cout << "Node Not Found" << endl;
-  }
-  if(linkedList -> remove(new ListNode<int>(33))) {
-    cout << "33 Delete Successful" << endl;
-  } else {
-    cout << "33 Node Not Found" << endl;
-  }
-  if(linkedList -> remove(21)) {
-    cout << "21 Delete Successful" << endl;
-  } else {
-    cout << "21 Node Not Found" << endl;
-  }
-  if(linkedList -> remove(33)) {
-    cout << "33 Delete Successful" << endl;
-  } else {
-    cout << "33 Node Not Found" << endl;
-  }
+  linkedList -> insert(new ListNode<int>(32), 5);
   linkedList -> print();
+  linkedList -> removeFromBegin();
+  linkedList -> print();
+  linkedList -> removeFromEnd();
+  linkedList -> print();
+  cout << linkedList -> getLast() -> getData() << endl;
+  linkedList -> remove(8);
+  linkedList -> print();
+  cout << linkedList -> toString() << endl;
   return 0;
 }
